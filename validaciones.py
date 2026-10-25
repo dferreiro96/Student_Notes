@@ -9,7 +9,7 @@ def pedir_notas(mensaje):
         try:
             notas = float(input(mensaje))
             if notas < 0 or notas > 100:
-                print("Introduzca un valor válido de notas.")
+                print("Introduzca un valor válido de notas (0-100).")
                 continue
             return notas
         except ValueError:

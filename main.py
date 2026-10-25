@@ -1,18 +1,19 @@
+from exportar_datos import exportar_datos
 from logica import calcular_max, calcular_min, calcular_promedio, mostrar_resultados
 from menu import menu
+from persistencia import cargar_datos, guardar_datos
 from utilidades import escoer_opcion
 from validaciones import pedir_estudiante, pedir_notas
 
 
 def main():
-    print("""\nEjercicio 5. Notas de estudiantes con funciones.
-- Pedir nombres y notas.
-- Mostrar promedio, mejor, peor nota.
-- Funciones: pedir_estudiante, calcular_promedio, mostrar_resultados.""")
-    datos_de_estudiantes = []
+    print("\nNotas de estudiantes con funciones")
+    
+    datos_de_estudiantes = cargar_datos()
     while True:
         menu()
-        opcion = escoer_opcion("\nTeclee una opción: ", ["1", "2", "3", "4", "5"])
+    
+        opcion = escoer_opcion("\nTeclee una opción: ", ["1", "2", "3", "4", "5", "6"])
         if opcion == "1":
             estudiante = pedir_estudiante("\nIntroduzca el nombre del estudiante: ")
             if not estudiante.replace(" ", "").isalpha():
@@ -27,15 +28,19 @@ def main():
                 print("Ya el estudiante se encuentra registrado.")
                 continue
             else:
-                print(f"\nSe ha añadido el estudiante {estudiante}.")
+                print(f"Se ha añadido el estudiante {estudiante}.")
                 notas = pedir_notas(f"\nIntroduzca la nota de {estudiante}: ")
+                print(f"Se ha añadido la nota de {estudiante} correctamente.")
                 datos_de_estudiantes.append({"Nombre": estudiante, "Nota": notas})
-                print(f"\nSe ha añadido la nota de {estudiante} correctamente.")
+                print(f"\nSe han guardado los datos de {estudiante} correctamente\n")
+                guardar_datos(datos_de_estudiantes)
+                
 
         elif opcion == "2":
             if not datos_de_estudiantes:
-                print("No se ha introducido ningún dato.")
+                print("\nNo se ha introducido ningún dato.")
             else:
+                print()
                 mostrar_resultados(
                     datos_de_estudiantes
                 )
@@ -52,12 +57,19 @@ def main():
                     "\nCómo desea ordenar la muestra?: ", ["1", "2"]
                 )
                 if ordenar_por == "1":
+                    print("\nOrdenando por nombre:")
                     ordenados = sorted(datos_de_estudiantes, key=lambda x: x["Nombre"])
                     for i, estudiantes in enumerate(ordenados, start=1):
                         print(f"{i}. {estudiantes["Nombre"]}: {estudiantes["Nota"]}")
 
                 elif ordenar_por == "2":
+                    print("\nOrdenando por notas ascendentes:")
                     ordenados = sorted(datos_de_estudiantes, key=lambda x: x["Nota"])
+                    for i, estudiantes in enumerate(ordenados, start=1):
+                        print(f"{i}. {estudiantes["Nombre"]}: {estudiantes["Nota"]}")
+                        
+                    print("\nOrdenando por notas descendentes:")
+                    ordenados = sorted(datos_de_estudiantes, key=lambda x: x["Nota"], reverse=True)
                     for i, estudiantes in enumerate(ordenados, start=1):
                         print(f"{i}. {estudiantes["Nombre"]}: {estudiantes["Nota"]}")
 
@@ -70,8 +82,10 @@ def main():
                 maximo = calcular_max(datos_de_estudiantes)
                 minimo = calcular_min(datos_de_estudiantes)
                 print(
-                    f"El promedio es {promedio:.2f}. La mejor y peor notas son {maximo} y {minimo} respectivamente."
+                    f"\nEl promedio es {promedio:.2f}. La mejor y peor notas fueron {maximo} y {minimo} respectivamente."
                 )
+        elif opcion == "5":
+            exportar_datos(datos_de_estudiantes)            
 
         else:
             break
