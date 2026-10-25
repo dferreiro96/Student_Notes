@@ -85,7 +85,10 @@ def main():
                     f"\nEl promedio es {promedio:.2f}. La mejor y peor notas fueron {maximo} y {minimo} respectivamente."
                 )
         elif opcion == "5":
-            exportar_datos(datos_de_estudiantes)            
+            if datos_de_estudiantes:
+                exportar_datos(datos_de_estudiantes)  
+            else:
+                print("\nNo hay datos para exportar")          
 
         else:
             break
