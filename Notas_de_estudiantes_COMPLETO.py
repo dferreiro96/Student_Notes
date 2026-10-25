@@ -1,9 +1,44 @@
-"""
-Ejercicio 5. Notas de estudiantes con funciones.
-- Pedir nombres y notas.
-- Mostrar promedio, mejor, peor nota.
-- Funciones: pedir_estudiante, calcular_promedio, mostrar_resultados.
-"""
+import csv
+import json
+
+
+def guardar_datos(datos_de_estudiantes):
+
+    with open("datos_de_estudiantes.json", "w", encoding="utf-8") as archivo:
+        json.dump(datos_de_estudiantes, archivo, indent=4, ensure_ascii=False)
+
+
+def cargar_datos():
+    try:
+        with open("datos_de_estudiantes.json", "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+            print("\nSe han recuperado los datos correctamente")
+            return datos
+    except FileNotFoundError:
+        print(
+            "\nNo se encontraron datos guardados. Se creará una nueva hoja de cálculo."
+        )
+        return []
+    except json.JSONDecodeError:
+        print("\nLos datos estaban corruptos. Se creará una nueva hoja de cálculo.")
+        return []
+
+
+def exportar_datos(datos_de_estudiantes):
+    try:
+        with open(
+            "datos_de_los_estudiantes.csv", "w", newline="", encoding="utf-8"
+        ) as archivo:
+            escritor = csv.DictWriter(archivo, fieldnames=["Nombre", "Nota"])
+            escritor.writeheader()
+            escritor.writerows(datos_de_estudiantes)
+            print("\nSe han exportado los datos de los estudiantes correctamente")
+    except PermissionError:
+        print(
+            "\nNo se ha podido exportar los datos. Otra aplicación está usando el archivo."
+        )
+    except Exception as e:
+        print(f"\nOcurrió un error inesperado: {e}")
 
 
 def pedir_estudiante(mensaje):
@@ -31,25 +66,22 @@ def calcular_promedio(datos_de_estudiantes):
 
 
 def calcular_max(datos_de_estudiantes):
-    mayor = float('-inf')
+    mayor = float("-inf")
     for est in datos_de_estudiantes:
         mayor = max(mayor, est["Nota"])
-    return mayor       
-    
-
+    return mayor
 
 
 def calcular_min(datos_de_estudiantes):
-    menor = float('inf')
+    menor = float("inf")
     for est in datos_de_estudiantes:
-       menor = min(menor, est["Nota"])
+        menor = min(menor, est["Nota"])
     return menor
-           
 
 
 def mostrar_resultados(datos_de_estudiantes):
     for i, estudiante in enumerate(datos_de_estudiantes, start=1):
-        print(f"{i}. {estudiante["Nombre"]}: {estudiante["Nota"]}")
+        print(f"{i}. {estudiante['Nombre']}: {estudiante['Nota']}")
 
 
 def menu():
@@ -58,7 +90,8 @@ def menu():
     print("2. Mostrar relación de estudiantes con sus notas.")
     print("3. Ordenar y mostrar relación de estudiantes.")
     print("4. Calcular promedio, mejor y menor nota; mostrar.")
-    print("5. Salir.")
+    print("5. Exportar datos a una hoja de cálculos.")
+    print("6. Salir.")
 
 
 def escoer_opcion(mensaje, opciones):
@@ -72,14 +105,11 @@ def escoer_opcion(mensaje, opciones):
 
 
 def jugar():
-    print("""\nEjercicio 5. Notas de estudiantes con funciones.
-- Pedir nombres y notas.
-- Mostrar promedio, mejor, peor nota.
-- Funciones: pedir_estudiante, calcular_promedio, mostrar_resultados.""")
-    datos_de_estudiantes = []
+    print("\nNotas de estudiantes con funciones.")
+    datos_de_estudiantes = cargar_datos()
     while True:
         menu()
-        opcion = escoer_opcion("\nTeclee una opción: ", ["1", "2", "3", "4", "5"])
+        opcion = escoer_opcion("\nTeclee una opción: ", ["1", "2", "3", "4", "5", "6"])
         if opcion == "1":
             estudiante = pedir_estudiante("\nIntroduzca el nombre del estudiante: ")
             if not estudiante.replace(" ", "").isalpha():
@@ -103,9 +133,7 @@ def jugar():
             if not datos_de_estudiantes:
                 print("No se ha introducido ningún dato.")
             else:
-                mostrar_resultados(
-                    datos_de_estudiantes
-                )
+                mostrar_resultados(datos_de_estudiantes)
         elif opcion == "3":
             if not datos_de_estudiantes:
                 print("No se ha introducido ningún dato.")
@@ -121,12 +149,20 @@ def jugar():
                 if ordenar_por == "1":
                     ordenados = sorted(datos_de_estudiantes, key=lambda x: x["Nombre"])
                     for i, estudiantes in enumerate(ordenados, start=1):
-                        print(f"{i}. {estudiantes["Nombre"]}: {estudiantes["Nota"]}")
+                        print(f"{i}. {estudiantes['Nombre']}: {estudiantes['Nota']}")
 
                 elif ordenar_por == "2":
+                    print("\nOrdenando por notas ascendentes:")
                     ordenados = sorted(datos_de_estudiantes, key=lambda x: x["Nota"])
                     for i, estudiantes in enumerate(ordenados, start=1):
-                        print(f"{i}. {estudiantes["Nombre"]}: {estudiantes["Nota"]}")
+                        print(f"{i}. {estudiantes['Nombre']}: {estudiantes['Nota']}")
+
+                    print("\nOrdenando por notas descendentes:")
+                    ordenados = sorted(
+                        datos_de_estudiantes, key=lambda x: x["Nota"], reverse=True
+                    )
+                    for i, estudiantes in enumerate(ordenados, start=1):
+                        print(f"{i}. {estudiantes['Nombre']}: {estudiantes['Nota']}")
 
         elif opcion == "4":
             if not datos_de_estudiantes:
@@ -139,9 +175,11 @@ def jugar():
                 print(
                     f"El promedio es {promedio:.2f}. La mejor y peor notas son {maximo} y {minimo} respectivamente."
                 )
+        elif opcion == "5":
+            exportar_datos(datos_de_estudiantes)
 
         else:
-            return
+            break
 
 
 def main():
@@ -151,4 +189,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
